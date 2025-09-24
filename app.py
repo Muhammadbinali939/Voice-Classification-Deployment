@@ -53,7 +53,7 @@ elif menu == "About":
 
         #### 👨‍💻 Developed by:  
         **Muhammad Bin Ali**  
-        *Data Scientist | ML/DL Enthusiast | Generative AI | Agentic AI*  
+        *Data Scientist | AI/ML Engineer | Generative AI | Agentic AI*  
 
         ---
         ✅ **Tech Stack**:  
@@ -64,3 +64,4 @@ elif menu == "About":
         """
     )
     st.success("Thank you for visiting this app 🚀")
+
