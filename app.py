@@ -37,10 +37,13 @@ if menu == "Home":
         st.success("✅ Features extracted!")
 
         # -------------------- Prediction --------------------
-        prediction = model.predict(features)[0]
-
-        st.subheader("🔮 Prediction Result")
-        st.write(f"**This voice is classified as:** 🎤 {prediction}")
+       # Prediction with error handling
+try:
+    prediction = model.predict(features)[0]
+    st.subheader("🔮 Prediction Result")
+    st.write(f"**This voice is classified as:** 🎤 {prediction}")
+except Exception as e:
+    st.error(f"Prediction failed: {e}")
 
 # -------------------- About Page --------------------
 elif menu == "About":
@@ -64,3 +67,4 @@ elif menu == "About":
         """
     )
     st.success("Thank you for visiting this app 🚀")
+
