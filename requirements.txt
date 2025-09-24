@@ -1,10 +1,5 @@
 streamlit
 numpy
-pandas
-scikit-learn
-matplotlib
-seaborn
-sounddevice
-wavio
-scipy
 joblib
+librosa
+soundfile
