@@ -3,5 +3,3 @@ numpy
 joblib
 librosa
 soundfile
-streamlit-webrtc
-av
