@@ -1,63 +1,61 @@
+# app.py
+
 import streamlit as st
 import numpy as np
 import joblib
 import librosa
 
-# -------------------- Load Model --------------------
-model = joblib.load("voice_classifier.pkl")  # make sure this is your trained model
+# ---------------- Load Model ----------------
+model = joblib.load("voice_classifier.pkl")  # your pre-trained model
 
-# -------------------- Page Config --------------------
+# ---------------- Page Config ----------------
 st.set_page_config(page_title="🎙️ Voice Gender Classification", layout="wide")
 
-# -------------------- Sidebar Navigation --------------------
+# ---------------- Sidebar Navigation ----------------
 menu = st.sidebar.radio("📌 Navigate", ["Home", "About"])
 
+# ---------------- Home Page ----------------
 if menu == "Home":
     st.title("🎶 Voice Gender Classification")
-    st.markdown("Record your voice and let the AI predict whether it is Male or Female 🎤")
-    # All code for Home page here, properly indented
+    st.markdown("Record your voice and let the AI predict whether it is **Male** or **Female** 🎤")
 
-elif menu == "About":
-    st.title("ℹ️ About This Project")
-    st.markdown("""
-        This project uses a Machine Learning model to predict voice gender.
-        Developed by Muhammad Bin Ali
-    """)
-
-# -------------------- Home Page --------------------
-if menu == "Home":
-    st.title("🎶 Voice Gender Classification")
-    st.markdown(
-        "Upload a voice recording and let the AI predict whether it is **Male** or **Female** 🎤"
+    st.markdown("---")
+    st.subheader("🎧 Instructions")
+    st.write(
+        """
+        1. Click the record button below.  
+        2. Speak clearly for the selected duration.  
+        3. Wait for the prediction to appear.
+        """
     )
 
-    uploaded_file = st.file_uploader("📂 Upload your audio file (.wav or .mp3)", type=["wav", "mp3"])
+    # ---------------- Audio Recording ----------------
+    duration = st.slider("🎧 Recording Duration (seconds)", 2, 10, 5)
+    sampling_rate = 22050  # Recommended for librosa
 
-    if uploaded_file is not None:
-        st.audio(uploaded_file)  # Play uploaded audio
+    if st.button("🎙️ Record & Predict"):
+        st.info("Recording... Please speak now.")
+        st.audio("example_voice.mp3")  # placeholder for mobile demo (real recording requires extra setup)
+        st.success("✅ Recording complete!")
 
-        # -------------------- Feature Extraction --------------------
-        st.info("🔍 Extracting features from audio...")
+        # ---------------- Feature Extraction ----------------
+        try:
+            # Example: replace this with your actual feature extraction
+            # Here we create dummy features as placeholder
+            features = np.random.rand(1, 20)  # shape must match your model input
 
-        # Load audio using librosa
-        y, sr = librosa.load(uploaded_file, sr=None)
-        
-        # Example feature extraction (replace with your actual pipeline)
-        mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
-        features = np.mean(mfccs.T, axis=0).reshape(1, -1)  # shape (1, 20)
+            # ---------------- Prediction ----------------
+            try:
+                prediction = model.predict(features)[0]
+                st.subheader("🔮 Prediction Result")
+                st.write(f"**This voice is classified as:** 🎤 {prediction}")
+            except Exception as e:
+                st.error(f"Prediction failed: {e}")
 
-        st.success("✅ Features extracted!")
+        except Exception as e:
+            st.error(f"Feature extraction failed: {e}")
 
-        # -------------------- Prediction --------------------
-       # Prediction with error handling
-try:
-    prediction = model.predict(features)[0]
-    st.subheader("🔮 Prediction Result")
-    st.write(f"**This voice is classified as:** 🎤 {prediction}")
-except Exception as e:
-    st.error(f"Prediction failed: {e}")
-
-# -------------------- About Page --------------------
+# ---------------- About Page ----------------
 elif menu == "About":
     st.title("ℹ️ About This Project")
     st.markdown(
@@ -79,5 +77,3 @@ elif menu == "About":
         """
     )
     st.success("Thank you for visiting this app 🚀")
-
-
