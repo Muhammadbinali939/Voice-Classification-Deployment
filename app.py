@@ -2,9 +2,10 @@ import streamlit as st
 import numpy as np
 import joblib
 import librosa
+from streamlit_webrtc import webrtc_streamer, WebRtcMode, ClientSettings
 
 # -------------------- Load Model --------------------
-model = joblib.load("voice_classifier.pkl")  # make sure this is your trained model
+model = joblib.load("voice_classifier.pkl")  # Make sure your trained model is here
 
 # -------------------- Page Config --------------------
 st.set_page_config(page_title="🎙️ Voice Gender Classification", layout="wide")
@@ -16,31 +17,45 @@ menu = st.sidebar.radio("📌 Navigate", ["Home", "About"])
 if menu == "Home":
     st.title("🎶 Voice Gender Classification")
     st.markdown(
-        "Upload a voice recording and let the AI predict whether it is **Male** or **Female** 🎤"
+        """
+        Record your voice directly in the browser, and let the AI predict whether it is **Male** or **Female** 🎤
+        """
     )
 
-    uploaded_file = st.file_uploader("📂 Upload your audio file (.wav or .mp3)", type=["wav", "mp3"])
+    st.markdown("### 🎙️ Record your voice")
+    st.info("Click 'Start Recording', speak, and wait a few seconds for prediction.")
 
-    if uploaded_file is not None:
-        st.audio(uploaded_file)  # Play uploaded audio
+    # -------------------- WebRTC Recorder --------------------
+    webrtc_ctx = webrtc_streamer(
+        key="voice-recorder",
+        mode=WebRtcMode.SENDONLY,
+        media_stream_constraints={"audio": True, "video": False},
+        client_settings=ClientSettings(
+            rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]},
+            media_stream_constraints={"audio": True, "video": False},
+        ),
+    )
 
-        # -------------------- Feature Extraction --------------------
-        st.info("🔍 Extracting features from audio...")
+    # -------------------- Prediction --------------------
+    if webrtc_ctx.audio_receiver:
+        audio_frames = webrtc_ctx.audio_receiver.get_frames(timeout=1)
+        if audio_frames:
+            # Convert audio frames to numpy array
+            audio_data = np.hstack([f.to_ndarray() for f in audio_frames])
 
-        # Load audio using librosa
-        y, sr = librosa.load(uploaded_file, sr=None)
-        
-        # Example feature extraction (replace with your actual pipeline)
-        mfccs = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=20)
-        features = np.mean(mfccs.T, axis=0).reshape(1, -1)  # shape (1, 20)
+            # -------------------- Feature Extraction --------------------
+            # Example: MFCC extraction (replace with your actual pipeline if needed)
+            try:
+                mfccs = librosa.feature.mfcc(y=audio_data.astype(float), sr=44100, n_mfcc=20)
+                features = np.mean(mfccs.T, axis=0).reshape(1, -1)
 
-        st.success("✅ Features extracted!")
+                # Prediction
+                prediction = model.predict(features)[0]
 
-        # -------------------- Prediction --------------------
-        prediction = model.predict(features)[0]
-
-        st.subheader("🔮 Prediction Result")
-        st.write(f"**This voice is classified as:** 🎤 {prediction}")
+                st.subheader("🔮 Prediction Result")
+                st.write(f"**This voice is classified as:** 🎤 {prediction}")
+            except Exception as e:
+                st.error(f"Error during feature extraction or prediction: {e}")
 
 # -------------------- About Page --------------------
 elif menu == "About":
@@ -64,4 +79,3 @@ elif menu == "About":
         """
     )
     st.success("Thank you for visiting this app 🚀")
-
