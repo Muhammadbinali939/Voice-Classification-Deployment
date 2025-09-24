@@ -1,5 +1,6 @@
-streamlit
+streamlit>=1.22
 numpy
+scikit-learn
 joblib
 librosa
 soundfile
