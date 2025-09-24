@@ -12,6 +12,18 @@ st.set_page_config(page_title="🎙️ Voice Gender Classification", layout="wid
 # -------------------- Sidebar Navigation --------------------
 menu = st.sidebar.radio("📌 Navigate", ["Home", "About"])
 
+if menu == "Home":
+    st.title("🎶 Voice Gender Classification")
+    st.markdown("Record your voice and let the AI predict whether it is Male or Female 🎤")
+    # All code for Home page here, properly indented
+
+elif menu == "About":
+    st.title("ℹ️ About This Project")
+    st.markdown("""
+        This project uses a Machine Learning model to predict voice gender.
+        Developed by Muhammad Bin Ali
+    """)
+
 # -------------------- Home Page --------------------
 if menu == "Home":
     st.title("🎶 Voice Gender Classification")
@@ -67,4 +79,5 @@ elif menu == "About":
         """
     )
     st.success("Thank you for visiting this app 🚀")
+
 
